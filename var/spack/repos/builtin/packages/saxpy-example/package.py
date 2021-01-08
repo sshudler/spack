@@ -46,7 +46,8 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
                 '-DCMAKE_CUDA_HOST_COMPILER={0}'.format(env["SPACK_CXX"])])
             cuda_archs = spec.variants['cuda_arch'].value
             if 'none' not in cuda_archs:
-                options.append('-DCMAKE_CUDA_FLAGS=-arch=sm_{0}'.format(cuda_arch[0]))
+                options.append('-DCUDA_NVCC_FLAGS={0}'.format(
+                    ' '.join(self.cuda_flags(cuda_archs))))
         else:
             options.append('-DENABLE_CUDA=OFF')
 

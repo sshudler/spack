@@ -67,7 +67,7 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
 
         return options
 
-    def test_target(self, target_exe):
+    def _test_target(self, target_exe):
         reason = "test installation of {0}".format(target_exe)
         self.run_test(target_exe, ['1'], ['Buffer size: 1048576', 'Max error: 0'],
                       status=0, installed=True, purpose=reason, skip_missing=False, work_dir='.')
@@ -76,8 +76,8 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
         """ Perform smoke test on the installation."""
 
         if '+cuda' in self.spec:
-            self.test_target('saxpy-cuda')
+            self._test_target('saxpy-cuda')
 
         if '+rocm' in self.spec:
-            self.test_target('saxpy-hip')
+            self._test_target('saxpy-hip')
 

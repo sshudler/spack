@@ -21,6 +21,7 @@
 # ----------------------------------------------------------------------------
 
 from spack import *
+import os
 
 
 class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
@@ -54,16 +55,23 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
         if '+rocm' in spec:
             options.extend([
                 '-DENABLE_HIP=ON',
-                '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)])
+                '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)
+            ])
 
             hip_archs = self.spec.variants['amdgpu_target'].value
             if 'none' not in hip_archs:
                 archs_str = ",".join(hip_archs)
                 options.append(
-                    '-DHIP_HIPCC_FLAGS=--amdgpu-target={0}'.format(archs_str)
+                    '-DHIP_HIPCC_FLAGS=--amdgpu-target={0} --rocm-device-lib-path={1}'
+                    .format(archs_str, os.getenv('DEVICE_LIB_PATH'))
                 )
         else:
             options.append('-DENABLE_HIP=OFF')
+
+        if '%clang@11.0' in spec:
+            options.append('-DENABLE_ONEAPI=ON')
+        else:
+            options.append('-DENABLE_ONEAPI=OFF')
 
         return options
 
@@ -80,4 +88,3 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
 
         if '+rocm' in self.spec:
             self._test_target('saxpy-hip')
-

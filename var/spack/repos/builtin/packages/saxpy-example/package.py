@@ -35,7 +35,11 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
 
     version('master', branch='master')
 
+    # Variant for when we want to compile with OenAPI
+    variant('sycl', default=False, description='Build with OneAPI')
+    
     depends_on('cmake@3.13:', when='+cuda', type='build')
+    depends_on('intel-oneapi-compilers', when='+sycl', type='build')
 
     def cmake_args(self):
         spec = self.spec
@@ -68,7 +72,7 @@ class SaxpyExample(CMakePackage, CudaPackage, ROCmPackage):
         else:
             options.append('-DENABLE_HIP=OFF')
 
-        if '%clang@11.0' in spec:
+        if '+sycl' in spec:
             options.append('-DENABLE_ONEAPI=ON')
         else:
             options.append('-DENABLE_ONEAPI=OFF')
